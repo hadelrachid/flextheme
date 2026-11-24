@@ -1,0 +1,359 @@
+<?php
+/**
+ * Template Home Oficial da Loja RachidD.com (Estilo AliExpress / Dropshipping Global)
+ */
+$baseUrl = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+
+// 1. Carrega produtos publicados ordenados pela atualização mais recente (ciclo 24h / edições no Admin)
+$catalogProducts = [];
+$homeCycleInfo = [
+    'seconds_remaining'   => 0,
+    'formatted_remaining' => '00:00:00',
+    'is_due'              => false,
+    'last_cycle_date'     => '',
+];
+try {
+    if (isset($GLOBALS['app'])) {
+        $container = $GLOBALS['app']->getContainer();
+        if ($container->has(\DomainSystem\Plugins\domain_drop\Contracts\DropshipCatalogRepositoryInterface::class)) {
+            $repo = $container->make(\DomainSystem\Plugins\domain_drop\Contracts\DropshipCatalogRepositoryInterface::class);
+            $catalogProducts = $repo->list(['status' => 'published', 'sort' => 'updated_desc'], 12);
+        }
+        if ($container->has(\DomainSystem\Plugins\domain_drop\Contracts\ProductMiningServiceInterface::class)) {
+            $miningSvc = $container->make(\DomainSystem\Plugins\domain_drop\Contracts\ProductMiningServiceInterface::class);
+            $homeCycleInfo = $miningSvc->getDailyCycleInfo();
+        }
+    }
+} catch (\Throwable $e) {
+    $catalogProducts = [];
+}
+
+// 2. Se o catálogo estiver vazio, adquire e persiste os produtos campeões de vendas
+if (empty($catalogProducts) && isset($miningSvc)) {
+    try {
+        $catalogProducts = $miningSvc->mineTrendingProducts('Eletrônicos & Gadget', 12, true, 'volume_desc');
+    } catch (\Throwable $e) {
+        $catalogProducts = [];
+    }
+}
+?>
+
+<!-- HERO SECTION: As Mil e Uma Noites ✨ Lâmpada de Aladim -->
+<section style="position: relative; padding: 70px 0 60px; text-align: center; overflow: hidden; background: linear-gradient(180deg, rgba(8,12,20,0.6) 0%, rgba(17,23,34,0.95) 100%);">
+    <!-- Efeito de Estrelas Cintilantes e Cadentes -->
+    <div class="hero-stars-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;">
+        <div class="hero-shooting-star" style="top: 20%; left: 15%; animation: heroShoot 6s infinite 1s;"></div>
+        <div class="hero-shooting-star" style="top: 45%; left: 55%; animation: heroShoot 7s infinite 3s;"></div>
+    </div>
+
+    <div class="container" style="position: relative; z-index: 2;">
+        <!-- Lâmpada Mágica Flutuante com Fumaça Mística -->
+        <div style="margin-bottom: 20px; display: inline-block; filter: drop-shadow(0 0 24px rgba(212,175,55,0.6)); animation: floatLamp 3s ease-in-out infinite;">
+            <img src="<?= $baseUrl ?>/assets/img/site-home/logo-lampada.svg" alt="Lâmpada Mágica de Aladim RachidD" style="height: 100px; width: auto; display: block;">
+        </div>
+
+        <div style="display: inline-block; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.35); padding: 6px 18px; border-radius: 50px; margin-bottom: 18px;">
+            <span style="color: #F0D060; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">
+                🔎 Curadoria de Produtos Físicos Minerados • AliExpress Brasil
+            </span>
+        </div>
+
+        <h1 style="font-size: clamp(32px, 5vw, 54px); font-weight: 800; color: #fff; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.15;">
+            Produtos Minerados com <br>
+            <span class="text-gold">Curadoria Especializada</span>
+        </h1>
+
+        <p style="font-size: 17px; color: #cbd5e1; max-width: 760px; margin: 0 auto 32px auto; line-height: 1.65;">
+            Somos uma curadoria especializada em localizar, via SDK oficial do AliExpress, produtos físicos já disponíveis no Brasil com as melhores <strong>notas, aprovações e termômetro de vendas</strong>. O valor exibido remunera nossa busca técnica, filtragem de fornecedores confiáveis e cobertura integral com <strong>garantia de entrega</strong>.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 45px;">
+            <a href="<?= $baseUrl ?>/loja" class="gold-button" style="font-size: 15px; padding: 14px 32px;">
+                <span>✨ Explorar Catálogo Minerado</span>
+                <span>➔</span>
+            </a>
+            <a href="#desejos" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 14px 28px; border-radius: 8px; font-weight: 700; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                <span>🔥 Ver Desejos do Dia</span>
+            </a>
+        </div>
+
+        <!-- Trust Stats (Mil e Uma Noites) -->
+        <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.08); max-width: 840px; margin: 0 auto;">
+            <div>
+                <div style="font-size: 26px; font-weight: 800; color: #F0D060;">4.7★+</div>
+                <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Notas &amp; Termômetro Real</div>
+            </div>
+            <div style="opacity: 0.3; align-self: center;">|</div>
+            <div>
+                <div style="font-size: 26px; font-weight: 800; color: #F0D060;">100%</div>
+                <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Garantia de Entrega</div>
+            </div>
+            <div style="opacity: 0.3; align-self: center;">|</div>
+            <div>
+                <div style="font-size: 26px; font-weight: 800; color: #F0D060; display: inline-flex; align-items: center; gap: 8px;">
+                    <?= \DomainSystem\Plugins\domain_drop\Helpers\FlagHelper::br(26, 18) ?> 3 a 7 Dias
+                </div>
+                <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Curadoria AliExpress Brasil</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO: ✨ Desejos do Dia (Daily Flash Deals estilo Choice AliExpress) -->
+<section id="desejos" style="padding: 70px 0 40px; background: #0b0f17;">
+    <div class="container">
+        
+        <!-- Header da Seção com Timer Regressivo -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 35px; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212, 175, 55, 0.12); color: #F0D060; border: 1px solid rgba(212, 175, 55, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
+                    <span>⚡ OFERTAS RELÂMPAGO DO DIA</span>
+                </div>
+                <h2 style="font-size: clamp(24px, 3.5vw, 36px); font-weight: 800; color: #fff; margin: 0;">
+                    ✨ Desejos do Dia: <span class="text-gold">Seleção do Gênio</span>
+                </h2>
+                <p style="color: #94a3b8; font-size: 14px; margin: 6px 0 0 0;">
+                    Uma seleção especial sorteada diariamente com os maiores descontos da fábrica.
+                </p>
+            </div>
+
+            <!-- Countdown Real sincronizado com o Ciclo 24h do DomainDrop -->
+            <?php
+            $homeRemSeconds = max(0, (int)($homeCycleInfo['seconds_remaining'] ?? 0));
+            $homeTimerInitial = (string)($homeCycleInfo['formatted_remaining'] ?? '00:00:00');
+            if ($homeTimerInitial === '') {
+                $homeTimerInitial = '00:00:00';
+            }
+            ?>
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.3); padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap;">
+                <span style="color: #94a3b8;">Acaba em:</span>
+                <span style="color: #F0D060; font-weight: 800; font-family: 'Fira Code', monospace; font-size: 15px;" id="flash-timer"><?= htmlspecialchars($homeTimerInitial, ENT_QUOTES, 'UTF-8') ?></span>
+            </div>
+        </div>
+
+        <script>
+            if (window.initRachidDCycleCountdown) {
+                window.initRachidDCycleCountdown({
+                    remainingSeconds: <?= $homeRemSeconds ?>,
+                    singleElementId: 'flash-timer',
+                    cronUrl: '<?= $baseUrl ?>/dropship/cron-tick'
+                });
+            }
+        </script>
+
+        <!-- Product Grid -->
+        <div class="home-products-grid">
+            <?php if (!empty($catalogProducts)): ?>
+                <?php foreach ($catalogProducts as $p): ?>
+                    <?php 
+                    $productUrl = !empty($p->slug) ? $baseUrl . '/produto/' . urlencode($p->slug) : $baseUrl . '/produto/' . (int)$p->id;
+                    $checkoutUrl = $baseUrl . '/checkout/produto/' . (int)$p->id;
+                    $refPrice = $p->salePriceBrl * 1.4;
+                    ?>
+                    <article class="store-card">
+                        <div style="position: relative; width: 100%; height: 230px; background: #070a0e; overflow: hidden;">
+                            <a href="<?= htmlspecialchars($productUrl) ?>">
+                                <img src="<?= htmlspecialchars($p->mainImageUrl) ?>" alt="<?= htmlspecialchars($p->title) ?>" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                            </a>
+                            <span style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #F0D060 0%, #D4AF37 100%); color: #0b0f17; font-weight: 800; font-size: 10px; padding: 3px 7px; border-radius: 4px;">
+                                -40% OFF
+                            </span>
+                            <?php if (!empty($p->category)): ?>
+                                <span style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 5px;">
+                                    <?= htmlspecialchars($p->category) ?>
+                                </span>
+                            <?php endif; ?>
+
+                            <?php
+                            $cardRating = (float)($p->rating ?? 4.8);
+                            $starCount = (int)max(1, min(5, round($cardRating > 0 ? $cardRating : 4.8)));
+                            $starsEmoji = str_repeat('⭐', $starCount);
+                            $ordersCount = (int)($p->ordersCount ?? 0);
+                            $salesInformed = (string)($p->attributes['Vendas_Informadas'] ?? '');
+                            $reviewsCount = (int)($p->attributes['reviews_count'] ?? 0);
+                            ?>
+                            <?php if ($cardRating > 0): ?>
+                                <span style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.85); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; backdrop-filter: blur(4px);">
+                                    <span><?= $starsEmoji ?></span>
+                                    <span style="color: #fff; font-family: monospace;"><?= number_format($cardRating, 1) ?></span>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="home-card-body">
+                            <div>
+                                <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; line-height: 1.4; height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                    <a href="<?= htmlspecialchars($productUrl) ?>" style="color: #fff; text-decoration: none;">
+                                        <?= htmlspecialchars($p->title) ?>
+                                    </a>
+                                </h3>
+
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; font-size: 11.5px;">
+                                    <span style="letter-spacing: 1px; font-size: 12px;"><?= $starsEmoji ?></span>
+                                    <strong style="color: #fbbf24; font-family: monospace; font-size: 12px;"><?= number_format($cardRating > 0 ? $cardRating : 4.8, 1) ?></strong>
+                                    <?php if ($ordersCount > 0 && $salesInformed !== 'nao'): ?>
+                                        <span style="color: #94a3b8; font-size: 11px;">• <strong style="color: #e2e8f0;"><?= number_format($ordersCount, 0, ',', '.') ?></strong> vendidos</span>
+                                    <?php elseif ($reviewsCount > 0): ?>
+                                        <span style="color: #94a3b8; font-size: 11px;">• <strong style="color: #e2e8f0;"><?= $reviewsCount ?></strong> avaliações</span>
+                                    <?php else: ?>
+                                        <span style="color: #94a3b8; font-size: 11px;">• <strong style="color: #e2e8f0;">Destaque</strong> em vendas</span>
+                                    <?php endif; ?>
+                                </div>
+
+                                <?php $isNational = (!empty($p->attributes['origem_brasil']) || (isset($p->attributes['ship_from']) && $p->attributes['ship_from'] === 'BR')); ?>
+                                <div style="margin-bottom: 14px;">
+                                    <div style="font-size: 11px; color: #94a3b8; text-decoration: line-through;">
+                                        R$ <?= number_format($refPrice, 2, ',', '.') ?>
+                                    </div>
+                                    <div style="font-size: 20px; font-weight: 700; color: #5cd67d; font-family: monospace;">
+                                        R$ <?= number_format($p->salePriceBrl, 2, ',', '.') ?>
+                                    </div>
+                                    <div style="font-size: 10.5px; color: <?= $isNational ? '#4ade80' : '#F0D060' ?>; margin-top: 2px; font-weight: <?= $isNational ? '600' : 'normal' ?>; display: flex; align-items: center; flex-wrap: wrap;">
+                                        <?= $isNational ? (\DomainSystem\Plugins\domain_drop\Helpers\FlagHelper::br(15, 10) . ' Estoque no Brasil • Envio Rápido 3 a 7 dias') : '⚡ Frete Internacional Grátis & Rastreado' ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="home-card-actions">
+                                <a href="<?= htmlspecialchars($productUrl) ?>" class="home-btn-details">
+                                    <span>🔍</span>
+                                    <span>Ver Detalhes</span>
+                                </a>
+                                <a href="<?= htmlspecialchars($checkoutUrl) ?>" class="home-btn-buy">
+                                    Comprar ➔
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(212,175,55,0.25); border-radius: 14px;">
+                    <span style="font-size: 32px; display: block; margin-bottom: 10px;">✨</span>
+                    <h3 style="color: #fff; margin: 0 0 6px 0; font-size: 18px;">Curadoria em Atualização Diária</h3>
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0 0 16px 0;">Nosso robô autônomo está minerando novas oportunidades para o ciclo de 24 horas.</p>
+                    <a href="<?= $baseUrl ?>/loja" class="gold-button" style="padding: 10px 22px; font-size: 13px;">Explorar Loja Completa ➔</a>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="<?= $baseUrl ?>/loja" class="gold-button" style="padding: 14px 40px; font-size: 14px;">
+                Ver Todas as Ofertas da Loja Oficial ➔
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO: Cadastro de Cliente na Home (Pedidos, Rastreamento e Devoluções) -->
+<?php
+$homeCustomerId = 0;
+$homeCustomerName = '';
+$homeCsrf = '';
+try {
+    if (isset($GLOBALS['app'])) {
+        $hc = $GLOBALS['app']->getContainer();
+        if ($hc->has(\DomainSystem\Core\Contracts\SessionManagerInterface::class)) {
+            $hs = $hc->make(\DomainSystem\Core\Contracts\SessionManagerInterface::class);
+            $homeCustomerId = (int)$hs->get('customer_id', 0);
+            $homeCustomerName = (string)$hs->get('customer_name', '');
+            $homeCsrf = (string)$hs->getCsrfToken();
+        }
+    }
+} catch (\Throwable $e) {
+}
+?>
+<section id="cadastro-cliente" class="home-signup-section">
+    <div class="container">
+        <div class="home-signup-card">
+            <div style="min-width: 0;">
+                <span style="display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; color: #F0D060; text-transform: uppercase; background: rgba(212,175,55,0.12); padding: 4px 12px; border-radius: 99px; border: 1px solid rgba(212,175,55,0.35);">
+                    Conta Gratuita do Comprador
+                </span>
+                <h2 class="home-signup-title">
+                    Cadastre-se para Acompanhar Pedidos e Garantias
+                </h2>
+                <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; margin: 0 0 16px 0;">
+                    Com seu cadastro na RachidD.com, seus pedidos ficam vinculados ao seu painel com barra de prazo de entrega, checkout agilizado e área dedicada para enviar fotos ou PDF caso precise de reembolso ou intermediação.
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px 14px; font-size: 12.5px; color: #cbd5e1;">
+                    <span>✅ Garantia 7 a 15 dias</span>
+                    <span>✅ Envio de fotos / PDF</span>
+                    <span>✅ Suporte direto com fornecedor</span>
+                </div>
+            </div>
+
+            <?php if ($homeCustomerId > 0): ?>
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 14px; padding: 22px 16px; text-align: center; box-sizing: border-box;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">👋</div>
+                    <h3 style="margin: 0 0 6px 0; color: #fff; font-size: 18px;">Bem-vindo(a), <?= htmlspecialchars($homeCustomerName, ENT_QUOTES, 'UTF-8') ?>!</h3>
+                    <p style="margin: 0 0 18px 0; font-size: 13px; color: #cbd5e1;">Sua conta já está ativa para compras, rastreamento e reclamações.</p>
+                    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <a href="<?= $baseUrl ?>/minha-conta" class="gold-button" style="padding: 11px 22px; font-size: 13px;">Acessar Minha Conta e Pedidos ➔</a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <form method="POST" action="<?= $baseUrl ?>/cadastro" class="home-signup-form">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($homeCsrf, ENT_QUOTES, 'UTF-8') ?>">
+                    <div class="home-signup-row-2">
+                        <input type="text" name="name" required placeholder="Nome Completo *" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; color: #fff; font-size: 13px;">
+                        <input type="email" name="email" required placeholder="Seu melhor E-mail *" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; color: #fff; font-size: 13px;">
+                    </div>
+                    <div class="home-signup-row-2">
+                        <input type="text" name="cpf" inputmode="numeric" maxlength="14" placeholder="CPF: 000.000.000-00" oninput="homeMaskCpf(this)" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; color: #fff; font-size: 13px;">
+                        <input type="tel" name="phone" inputmode="tel" maxlength="15" placeholder="WhatsApp: (11) 99999-9999" oninput="homeMaskPhone(this)" style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; color: #fff; font-size: 13px;">
+                    </div>
+                    <div style="position: relative;">
+                        <input id="home-reg-pass" type="password" name="password" required minlength="6" placeholder="Crie uma Senha (mín. 6 dígitos) *" style="width: 100%; box-sizing: border-box; padding: 10px 38px 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; color: #fff; font-size: 13px;">
+                        <button type="button" onclick="togglePasswordVisibility(this, 'home-reg-pass')" aria-label="Mostrar ou ocultar senha" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 4px; display: inline-flex; align-items: center;" title="Mostrar/ocultar senha">👁️</button>
+                    </div>
+                    <div class="home-signup-actions">
+                        <button type="submit" style="width: 100%; padding: 12px 16px; border: none; border-radius: 9px; background: linear-gradient(135deg, #F0D060 0%, #D4AF37 100%); color: #0b0f17; font-weight: 800; font-size: 14px; cursor: pointer;">
+                            Criar Minha Conta Grátis ➔
+                        </button>
+                        <a href="<?= $baseUrl ?>/entrar" style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; border-radius: 9px; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.45); color: #F0D060; font-weight: 800; font-size: 13.5px; text-decoration: none; white-space: nowrap;">
+                            🔐 Acessar
+                        </a>
+                    </div>
+                    <div style="text-align: center; font-size: 12px; color: #94a3b8; margin-top: 2px;">
+                        Já é cadastrado? <a href="<?= $baseUrl ?>/entrar" style="color: #F0D060; font-weight: 700; text-decoration: none;">Entrar na Minha Conta</a>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO: Garantias de Compra Internacional -->
+<section style="padding: 50px 0; background: #080c14; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px;">
+            <div style="display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 18px; border-radius: 10px;">
+                <span style="font-size: 32px;">🚚</span>
+                <div>
+                    <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 15px; font-weight: 700;">Envio Rastreado</h4>
+                    <p style="color: #94a3b8; margin: 0; font-size: 12px;">Código de rastreio ponto a ponto</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 18px; border-radius: 10px;">
+                <span style="font-size: 32px;">🛡️</span>
+                <div>
+                    <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 15px; font-weight: 700;">Garantia de 7 Dias</h4>
+                    <p style="color: #94a3b8; margin: 0; font-size: 12px;">Reembolso garantido por lei</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 18px; border-radius: 10px;">
+                <span style="font-size: 32px;">🔒</span>
+                <div>
+                    <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 15px; font-weight: 700;">Checkout Protegido</h4>
+                    <p style="color: #94a3b8; margin: 0; font-size: 12px;">Mercado Pago, Pix e PayPal</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 18px; border-radius: 10px;">
+                <span style="font-size: 32px;">💬</span>
+                <div>
+                    <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 15px; font-weight: 700;">Suporte Dedicado</h4>
+                    <p style="color: #94a3b8; margin: 0; font-size: 12px;">Atendimento em português</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
