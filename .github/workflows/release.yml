@@ -18,8 +18,11 @@ jobs:
 
       - name: Package Plugin Archive
         run: |
+          mkdir -p /tmp/pkg/flextheme
+          cp -r . /tmp/pkg/flextheme/
+          rm -rf /tmp/pkg/flextheme/.git /tmp/pkg/flextheme/.github /tmp/pkg/flextheme/dist
           mkdir -p dist
-          zip -r "dist/flextheme.zip" . -x ".git/*" -x ".github/*" -x "dist/*" -x "*.zip"
+          (cd /tmp/pkg && zip -r "$GITHUB_WORKSPACE/dist/flextheme.zip" flextheme)
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v1
